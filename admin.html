@@ -66,7 +66,7 @@
     }
     
     .pedido-info h3 { color: #2c5f2d; margin-bottom: 5px; }
-    .pedido-meta { font-size: 14px; color: #666; }
+    .pedido-meta { font-size: 14px; color: #666; line-height: 1.6; }
     
     .pedido-acciones {
       display: flex;
@@ -141,6 +141,18 @@
     .estado-nuevo { background: #28a745; color: white; }
     .estado-procesando { background: #ffc107; color: #000; }
     .estado-completado { background: #17a2b8; color: white; }
+    
+    .vendedor-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: bold;
+      margin-left: 5px;
+    }
+    
+    .vendedor-directo { background: #e3f2fd; color: #1976d2; }
+    .vendedor-registrado { background: #f3e5f5; color: #7b1fa2; }
     
     .vacio {
       text-align: center;
@@ -250,6 +262,12 @@
 
           const estado = pedido.estado || 'nuevo';
           const estadoClass = `estado-${estado}`;
+          
+          // Información del vendedor
+          const vendedor = pedido.vendedor || 'Cliente directo';
+          const tipoVenta = pedido.tipoVenta || 'Cliente directo';
+          const vendedorClass = tipoVenta === 'Vendedor' ? 'vendedor-registrado' : 'vendedor-directo';
+          const vendedorIcon = tipoVenta === 'Vendedor' ? '👤' : '🌐';
 
           let productosHTML = '';
           if (pedido.productos && pedido.productos.length > 0) {
@@ -284,9 +302,11 @@
               <div class="pedido-info">
                 <h3>👤 ${pedido.cliente}</h3>
                 <div class="pedido-meta">
-                  📅 ${fechaFormato} • 
-                  ID: ${pedido.id.substring(0, 8)} • 
-                  <span class="estado-badge ${estadoClass}">${estado.toUpperCase()}</span>
+                  📅 ${fechaFormato}<br>
+                  🆔 ID: ${pedido.id.substring(0, 8)} • 
+                  <span class="estado-badge ${estadoClass}">${estado.toUpperCase()}</span><br>
+                  ${vendedorIcon} <strong>Vendedor:</strong> ${vendedor}
+                  <span class="vendedor-badge ${vendedorClass}">${tipoVenta}</span>
                 </div>
               </div>
               <div class="pedido-acciones">
