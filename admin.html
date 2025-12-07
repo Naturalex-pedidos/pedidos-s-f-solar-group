@@ -2,93 +2,237 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>Admin Pedidos</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NATURALEX - S&F Solar Group</title>
   <style>
-    body { font-family: Arial, sans-serif; max-width: 1000px; margin: 0 auto; padding: 20px; background: #f5f5f5; }
-    h1 { text-align: center; }
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; }
-    th, td { border: 1px solid #ddd; padding: 6px 8px; font-size: 13px; }
-    th { background: #2c5f2d; color: white; }
-    tr:nth-child(even) { background: #f9f9f9; }
-    .total { font-weight: bold; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; background: #f5f5f5; }
+    
+    header { background: #2c5f2d; color: white; padding: 20px; text-align: center; }
+    header h1 { font-size: 28px; margin-bottom: 5px; }
+    header .empresa { font-size: 14px; opacity: 0.9; }
+    
+    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+    
+    .categorias { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-top: 30px; }
+    
+    .categoria-card { background: white; border-radius: 12px; padding: 30px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1); transition: transform 0.2s; cursor: pointer; text-decoration: none; color: inherit; }
+    .categoria-card:hover { transform: translateY(-5px); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+    
+    .categoria-icon { font-size: 48px; margin-bottom: 15px; }
+    .categoria-titulo { font-size: 20px; font-weight: bold; color: #2c5f2d; margin-bottom: 10px; }
+    .categoria-desc { font-size: 14px; color: #666; }
+    
+    .carrito-flotante { position: fixed; bottom: 20px; right: 20px; background: #0a7a27; color: white; padding: 15px 25px; border-radius: 50px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); cursor: pointer; font-weight: bold; text-decoration: none; }
+    .carrito-flotante:hover { background: #085d1e; }
+    .badge { background: red; border-radius: 50%; padding: 2px 8px; font-size: 12px; margin-left: 8px; }
+
+    /* Panel lateral del carrito */
+    .panel-carrito {
+      position: fixed;
+      top: 0;
+      right: -450px;
+      width: 450px;
+      height: 100vh;
+      background: white;
+      box-shadow: -4px 0 12px rgba(0,0,0,0.2);
+      transition: right 0.3s ease;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .panel-carrito.abierto { right: 0; }
+    
+    .panel-header {
+      background: #2c5f2d;
+      color: white;
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .panel-header h2 { margin: 0; font-size: 20px; }
+    
+    .btn-cerrar {
+      background: rgba(255,255,255,0.2);
+      border: none;
+      color: white;
+      font-size: 24px;
+      cursor: pointer;
+      padding: 5px 12px;
+      border-radius: 4px;
+    }
+    
+    .panel-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+    }
+    
+    .cliente-form-panel { margin-bottom: 20px; }
+    .cliente-form-panel input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      margin-top: 5px;
+    }
+    
+    .item-carrito {
+      background: #f9f9f9;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+    
+    .item-info { flex: 1; }
+    .item-nombre { font-weight: bold; font-size: 14px; margin-bottom: 5px; }
+    .item-codigo { font-size: 11px; color: #999; margin-bottom: 5px; }
+    .item-precio { font-size: 13px; color: #666; }
+    
+    .item-acciones { text-align: right; }
+    .item-subtotal { font-weight: bold; color: #0a7a27; margin-bottom: 5px; }
+    
+    .btn-eliminar {
+      background: #dc3545;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    
+    .total-panel {
+      background: #2c5f2d;
+      color: white;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 20px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .total-label { font-size: 18px; }
+    .total-monto { font-size: 24px; font-weight: bold; }
+    
+    .btn-enviar-panel {
+      width: 100%;
+      background: #0a7a27;
+      color: white;
+      border: none;
+      padding: 15px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-bottom: 10px;
+    }
+    .btn-enviar-panel:hover { background: #085d1e; }
+    
+    .btn-vaciar-panel {
+      width: 100%;
+      background: #999;
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    
+    @media (max-width: 500px) {
+      .panel-carrito { width: 100%; right: -100%; }
+    }
   </style>
 </head>
 <body>
-  <h1>📋 Pedidos – Panel Admin</h1>
-  <p>Recarga la página para actualizar la lista.</p>
+  <header>
+    <h1>🌿 NATURALEX</h1>
+    <p class="empresa">S&F SOLAR GROUP</p>
+    <p>Productos naturales de calidad</p>
+  </header>
 
-  <table>
-    <thead>
-      <tr>
-        <th>Fecha</th>
-        <th>Cliente</th>
-        <th>Total (S/)</th>
-        <th>Detalle productos</th>
-        <th>ID</th>
-      </tr>
-    </thead>
-    <tbody id="tbody-pedidos">
-      <!-- Aquí se insertan las filas desde Firestore -->
-    </tbody>
-  </table>
+  <div class="container">
+    <div class="categorias">
+      
+      <a href="colagenos.html" class="categoria-card">
+        <div class="categoria-icon">💊</div>
+        <div class="categoria-titulo">Colágenos</div>
+        <div class="categoria-desc">6 productos · Desde S/ 68.50</div>
+      </a>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
-    import { getFirestore, collection, getDocs, orderBy, query } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+      <a href="capsulas.html" class="categoria-card">
+        <div class="categoria-icon">💊</div>
+        <div class="categoria-titulo">Cápsulas x100</div>
+        <div class="categoria-desc">16 productos · Desde S/ 29.50</div>
+      </a>
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyAfxunq2yqARtsbyavQZM8_XGC47DNNQWk",
-      authDomain: "pedidos-solar-group.firebaseapp.com",
-      projectId: "pedidos-solar-group",
-      storageBucket: "pedidos-solar-group.firebasestorage.app",
-      messagingSenderId: "205423490666",
-      appId: "1:205423490666:web:50c23f6ebe6f1b95f8bc13",
-      measurementId: "G-Q9VW73GGFS"
-    };
+      <a href="nutricional.html" class="categoria-card">
+        <div class="categoria-icon">🥤</div>
+        <div class="categoria-titulo">Nutricionales</div>
+        <div class="categoria-desc">7 productos · Desde S/ 41.50</div>
+      </a>
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+      <a href="concentrados.html" class="categoria-card">
+        <div class="categoria-icon">🧪</div>
+        <div class="categoria-titulo">Concentrados</div>
+        <div class="categoria-desc">26 productos · Desde S/ 29.50</div>
+      </a>
 
-    const tbody = document.getElementById("tbody-pedidos");
+      <a href="otros.html" class="categoria-card">
+        <div class="categoria-icon">🏭</div>
+        <div class="categoria-titulo">Otros Productos</div>
+        <div class="categoria-desc">Dr. Willphar, LSF, Jarabes</div>
+      </a>
 
-    async function cargarPedidos() {
-      tbody.innerHTML = "<tr><td colspan='5'>Cargando...</td></tr>";
+    </div>
+  </div>
 
-      // leer colección pedidos ordenada por fecha descendente
-      const q = query(collection(db, "pedidos"), orderBy("fecha", "desc"));
-      const snap = await getDocs(q);           // lee todos los docs una vez[web:89][web:98]
+  <!-- Panel lateral del carrito -->
+  <div id="panelCarrito" class="panel-carrito">
+    <div class="panel-header">
+      <h2>🛒 Mi Carrito</h2>
+      <button class="btn-cerrar" onclick="cerrarCarrito()">✕</button>
+    </div>
+    
+    <div class="panel-body">
+      <div id="carritoVacio" style="text-align:center; padding:40px; color:#999;">
+        Tu carrito está vacío
+      </div>
+      
+      <div id="carritoContenido" style="display:none;">
+        <div class="cliente-form-panel">
+          <label><strong>Nombre del cliente:</strong></label>
+          <input type="text" id="nombreClientePanel" placeholder="Ingrese nombre">
+        </div>
+        
+        <div id="listaCarritoPanel"></div>
+        
+        <div class="total-panel">
+          <div class="total-label">Total:</div>
+          <div class="total-monto" id="totalCarritoPanel">S/ 0.00</div>
+        </div>
+        
+        <button class="btn-enviar-panel" onclick="enviarPedidoPanel()">📤 Enviar Pedido</button>
+        <button class="btn-vaciar-panel" onclick="if(confirm('¿Vaciar carrito?')) vaciarCarrito()">🗑️ Vaciar Carrito</button>
+      </div>
+    </div>
+  </div>
 
-      tbody.innerHTML = "";
+  <a href="javascript:void(0)" class="carrito-flotante" onclick="abrirCarrito()" id="btnCarrito">
+    🛒 Carrito <span class="badge" id="cantidadCarrito">0</span>
+  </a>
 
-      snap.forEach(doc => {
-        const data = doc.data();
-        const fecha = data.fecha || "";
-        const cliente = data.cliente || "";
-        const total = (data.total || 0).toFixed ? data.total.toFixed(2) : data.total;
-        const productos = Array.isArray(data.productos) ? data.productos : [];
-
-        const detalle = productos.map(p =>
-          `${p.nombre} (x${p.cantidad}) = S/ ${p.subtotal.toFixed(2)}`
-        ).join(" | ");
-
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${fecha}</td>
-          <td>${cliente}</td>
-          <td class="total">${total}</td>
-          <td>${detalle}</td>
-          <td>${doc.id}</td>
-        `;
-        tbody.appendChild(tr);
-      });
-
-      if (!snap.size) {
-        tbody.innerHTML = "<tr><td colspan='5'>Sin pedidos todavía</td></tr>";
-      }
-    }
-
-    cargarPedidos();
+  <script src="carrito.js"></script>
+  <script>
+    actualizarBadgeCarrito();
   </script>
 </body>
 </html>
