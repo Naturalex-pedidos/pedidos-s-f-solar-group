@@ -1,3 +1,129 @@
+// Funciones para manejar el carrito en localStorage
+
+function obtenerCarrito() {
+  const carrito = localStorage.getItem('carrito');
+  return carrito ? JSON.parse(carrito) : [];
+}
+
+function guardarCarrito(carrito) {
+  localStorage.setItem('carrito', JSON.stringify(carrito));
+  actualizarBadgeCarrito();
+  actualizarPanelCarrito();
+}
+
+function agregarAlCarrito(producto) {
+  let carrito = obtenerCarrito();
+  const existe = carrito.find(p => p.codigo === producto.codigo);
+  
+  if (existe) {
+    existe.cantidad++;
+  } else {
+    carrito.push({ ...producto, cantidad: 1 });
+  }
+  
+  guardarCarrito(carrito);
+}
+
+function quitarDelCarrito(codigo) {
+  let carrito = obtenerCarrito();
+  const producto = carrito.find(p => p.codigo === codigo);
+  
+  if (producto) {
+    producto.cantidad--;
+    if (producto.cantidad <= 0) {
+      carrito = carrito.filter(p => p.codigo !== codigo);
+    }
+  }
+  
+  guardarCarrito(carrito);
+}
+
+function eliminarDelCarrito(codigo) {
+  let carrito = obtenerCarrito();
+  carrito = carrito.filter(p => p.codigo !== codigo);
+  guardarCarrito(carrito);
+}
+
+function obtenerCantidadProducto(codigo) {
+  const carrito = obtenerCarrito();
+  const producto = carrito.find(p => p.codigo === codigo);
+  return producto ? producto.cantidad : 0;
+}
+
+function calcularTotal() {
+  const carrito = obtenerCarrito();
+  return carrito.reduce((total, p) => total + (p.precio * p.cantidad), 0);
+}
+
+function contarItems() {
+  const carrito = obtenerCarrito();
+  return carrito.reduce((total, p) => total + p.cantidad, 0);
+}
+
+function vaciarCarrito() {
+  localStorage.removeItem('carrito');
+  actualizarBadgeCarrito();
+  actualizarPanelCarrito();
+}
+
+function actualizarBadgeCarrito() {
+  const badge = document.getElementById('cantidadCarrito');
+  if (badge) {
+    const count = contarItems();
+    badge.textContent = count;
+    badge.style.display = count > 0 ? 'inline' : 'none';
+  }
+}
+
+function abrirCarrito() {
+  document.getElementById('panelCarrito').classList.add('abierto');
+  actualizarPanelCarrito();
+}
+
+function cerrarCarrito() {
+  document.getElementById('panelCarrito').classList.remove('abierto');
+}
+
+function actualizarPanelCarrito() {
+  const carrito = obtenerCarrito();
+  const lista = document.getElementById('listaCarritoPanel');
+  const totalEl = document.getElementById('totalCarritoPanel');
+  const vacioEl = document.getElementById('carritoVacio');
+  const contenidoEl = document.getElementById('carritoContenido');
+  
+  if (!lista) return;
+  
+  if (carrito.length === 0) {
+    vacioEl.style.display = 'block';
+    contenidoEl.style.display = 'none';
+    return;
+  }
+  
+  vacioEl.style.display = 'none';
+  contenidoEl.style.display = 'block';
+  
+  lista.innerHTML = '';
+  carrito.forEach(item => {
+    const div = document.createElement('div');
+    div.className = 'item-carrito';
+    div.innerHTML = `
+      <div class="item-info">
+        <div class="item-nombre">${item.nombre}</div>
+        <div class="item-codigo">COD: ${item.codigo}</div>
+        <div class="item-precio">S/ ${item.precio.toFixed(2)} x ${item.cantidad}</div>
+      </div>
+      <div class="item-acciones">
+        <div class="item-subtotal">S/ ${(item.precio * item.cantidad).toFixed(2)}</div>
+        <button class="btn-eliminar" onclick="eliminarDelCarrito('${item.codigo}')">🗑️</button>
+      </div>
+    `;
+    lista.appendChild(div);
+  });
+  
+  const total = calcularTotal();
+  totalEl.textContent = 'S/ ' + total.toFixed(2);
+}
+
 async function enviarPedidoPanel() {
   const nombre = document.getElementById('nombreClientePanel').value.trim();
   if (!nombre) {
