@@ -223,8 +223,18 @@
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
         
-        // Verificar rol del usuario
-        const userDoc = await getDoc(doc(db, 'usuarios', user.uid));
+        console.log('✅ Usuario autenticado:', user.email);
+        console.log('📋 UID:', user.uid);
+        
+        const docRef = doc(db, 'usuarios', user.uid);
+        console.log('🔍 Buscando documento en:', docRef.path);
+        
+        const userDoc = await getDoc(docRef);
+        console.log('📄 ¿Documento existe?', userDoc.exists());
+        
+        if (userDoc.exists()) {
+          console.log('📝 Datos del documento:', userDoc.data());
+        }
         
         if (!userDoc.exists()) {
           throw new Error('Usuario no encontrado en la base de datos');
@@ -236,7 +246,6 @@
           throw new Error(`Esta cuenta no tiene permisos de ${selectedRole}`);
         }
         
-        // Guardar sesión
         localStorage.setItem('userSession', JSON.stringify({
           uid: user.uid,
           email: user.email,
@@ -244,7 +253,6 @@
           rol: userData.rol
         }));
         
-        // Redirigir según rol
         if (selectedRole === 'admin') {
           window.location.href = 'admin.html';
         } else {
@@ -252,8 +260,16 @@
         }
         
       } catch (error) {
-        console.error('Error:', error);
-        errorMsg.textContent = error.message;
+        console.error('❌ Error completo:', error);
+        let mensaje = error.message;
+        if (error.code === 'auth/invalid-credential') {
+          mensaje = 'Correo o contraseña incorrectos';
+        } else if (error.code === 'auth/user-not-found') {
+          mensaje = 'Usuario no encontrado';
+        } else if (error.code === 'auth/wrong-password') {
+          mensaje = 'Contraseña incorrecta';
+        }
+        errorMsg.textContent = mensaje;
         errorMsg.style.display = 'block';
         btnSubmit.disabled = false;
         btnSubmit.textContent = 'Iniciar Sesión';
