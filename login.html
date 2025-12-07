@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login Vendedor - NATURALEX</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { 
+      font-family: Arial, sans-serif; 
+      background: linear-gradient(135deg, #2c5f2d 0%, #0a7a27 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .login-container {
+      background: white;
+      border-radius: 12px;
+      padding: 40px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+      max-width: 400px;
+      width: 90%;
+    }
+    
+    .logo {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    
+    .logo h1 {
+      color: #2c5f2d;
+      font-size: 28px;
+      margin-bottom: 5px;
+    }
+    
+    .logo p {
+      color: #666;
+      font-size: 14px;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-group label {
+      display: block;
+      color: #333;
+      font-weight: bold;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+    
+    .form-group input {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      font-size: 15px;
+      transition: border 0.3s;
+    }
+    
+    .form-group input:focus {
+      outline: none;
+      border-color: #2c5f2d;
+    }
+    
+    .btn-login {
+      width: 100%;
+      background: #0a7a27;
+      color: white;
+      border: none;
+      padding: 14px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    
+    .btn-login:hover {
+      background: #085d1e;
+    }
+    
+    .btn-login:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    
+    .error-msg {
+      background: #f8d7da;
+      color: #721c24;
+      padding: 12px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      display: none;
+    }
+    
+    .link-volver {
+      text-align: center;
+      margin-top: 20px;
+    }
+    
+    .link-volver a {
+      color: #0a7a27;
+      text-decoration: none;
+      font-size: 14px;
+    }
+    
+    .link-volver a:hover {
+      text-decoration: underline;
+    }
+    
+    .role-selector {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    
+    .role-btn {
+      flex: 1;
+      padding: 12px;
+      border: 2px solid #ddd;
+      background: white;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.3s;
+    }
+    
+    .role-btn.active {
+      background: #2c5f2d;
+      color: white;
+      border-color: #2c5f2d;
+    }
+    
+    .role-btn:hover {
+      border-color: #2c5f2d;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="logo">
+      <h1>🌿 NATURALEX</h1>
+      <p>Sistema de Ventas</p>
+    </div>
+    
+    <div id="errorMsg" class="error-msg"></div>
+    
+    <div class="role-selector">
+      <button class="role-btn active" onclick="selectRole('vendedor')" id="btnVendedor">
+        👤 Vendedor
+      </button>
+      <button class="role-btn" onclick="selectRole('admin')" id="btnAdmin">
+        🔐 Admin
+      </button>
+    </div>
+    
+    <form id="loginForm">
+      <div class="form-group">
+        <label>Correo electrónico</label>
+        <input type="email" id="email" placeholder="ejemplo@correo.com" required>
+      </div>
+      
+      <div class="form-group">
+        <label>Contraseña</label>
+        <input type="password" id="password" placeholder="••••••••" required>
+      </div>
+      
+      <button type="submit" class="btn-login" id="btnSubmit">
+        Iniciar Sesión
+      </button>
+    </form>
+    
+    <div class="link-volver">
+      <a href="index.html">← Volver a la tienda</a>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAfxunq2yqARtsbyavQZM8_XGC47DNNQWk",
+      authDomain: "pedidos-solar-group.firebaseapp.com",
+      projectId: "pedidos-solar-group",
+      storageBucket: "pedidos-solar-group.firebasestorage.app",
+      messagingSenderId: "205423490666",
+      appId: "1:205423490666:web:50c23f6ebe6f1b95f8bc13",
+      measurementId: "G-Q9VW73GGFS"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    
+    let selectedRole = 'vendedor';
+    
+    window.selectRole = function(role) {
+      selectedRole = role;
+      document.getElementById('btnVendedor').classList.toggle('active', role === 'vendedor');
+      document.getElementById('btnAdmin').classList.toggle('active', role === 'admin');
+    };
+    
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const errorMsg = document.getElementById('errorMsg');
+      const btnSubmit = document.getElementById('btnSubmit');
+      
+      errorMsg.style.display = 'none';
+      btnSubmit.disabled = true;
+      btnSubmit.textContent = 'Verificando...';
+      
+      try {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+        
+        // Verificar rol del usuario
+        const userDoc = await getDoc(doc(db, 'usuarios', user.uid));
+        
+        if (!userDoc.exists()) {
+          throw new Error('Usuario no encontrado en la base de datos');
+        }
+        
+        const userData = userDoc.data();
+        
+        if (userData.rol !== selectedRole) {
+          throw new Error(`Esta cuenta no tiene permisos de ${selectedRole}`);
+        }
+        
+        // Guardar sesión
+        localStorage.setItem('userSession', JSON.stringify({
+          uid: user.uid,
+          email: user.email,
+          nombre: userData.nombre,
+          rol: userData.rol
+        }));
+        
+        // Redirigir según rol
+        if (selectedRole === 'admin') {
+          window.location.href = 'admin.html';
+        } else {
+          window.location.href = 'index.html';
+        }
+        
+      } catch (error) {
+        console.error('Error:', error);
+        errorMsg.textContent = error.message;
+        errorMsg.style.display = 'block';
+        btnSubmit.disabled = false;
+        btnSubmit.textContent = 'Iniciar Sesión';
+      }
+    });
+  </script>
+</body>
+</html>
