@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Otros Productos - NATURALEX</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; background: #f5f5f5; }
+    
+    header { background: #2c5f2d; color: white; padding: 20px; }
+    .header-content { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+    .header-left h1 { font-size: 24px; margin-bottom: 5px; }
+    .header-left .empresa { font-size: 12px; opacity: 0.9; }
+    .back-btn { background: rgba(255,255,255,0.2); color: white; padding: 8px 16px; border-radius: 6px; text-decoration: none; }
+    
+    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+    
+    .productos { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+    
+    .producto { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+    .producto-nombre { font-weight: bold; font-size: 16px; margin-bottom: 8px; color: #333; }
+    .producto-codigo { font-size: 12px; color: #999; margin-bottom: 8px; }
+    .producto-precio { font-size: 20px; font-weight: bold; color: #0a7a27; margin: 10px 0; }
+    
+    .controles { display: flex; align-items: center; gap: 10px; margin-top: 15px; }
+    .btn { background: #0a7a27; color: white; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-size: 18px; font-weight: bold; }
+    .btn:hover { background: #085d1e; }
+    .btn-menos { background: #dc3545; }
+    .btn-menos:hover { background: #a02834; }
+    .cantidad { font-size: 18px; font-weight: bold; min-width: 40px; text-align: center; }
+    
+    .carrito-flotante { position: fixed; bottom: 20px; right: 20px; background: #0a7a27; color: white; padding: 15px 25px; border-radius: 50px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); cursor: pointer; font-weight: bold; text-decoration: none; }
+    .carrito-flotante:hover { background: #085d1e; }
+    .badge { background: red; border-radius: 50%; padding: 2px 8px; font-size: 12px; margin-left: 8px; }
+
+    .panel-carrito {
+      position: fixed;
+      top: 0;
+      right: -450px;
+      width: 450px;
+      height: 100vh;
+      background: white;
+      box-shadow: -4px 0 12px rgba(0,0,0,0.2);
+      transition: right 0.3s ease;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .panel-carrito.abierto { right: 0; }
+    
+    .panel-header {
+      background: #2c5f2d;
+      color: white;
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .panel-header h2 { margin: 0; font-size: 20px; }
+    
+    .btn-cerrar {
+      background: rgba(255,255,255,0.2);
+      border: none;
+      color: white;
+      font-size: 24px;
+      cursor: pointer;
+      padding: 5px 12px;
+      border-radius: 4px;
+    }
+    
+    .panel-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+    }
+    
+    .cliente-form-panel { margin-bottom: 20px; }
+    .cliente-form-panel input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      margin-top: 5px;
+    }
+    
+    .item-carrito {
+      background: #f9f9f9;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+    
+    .item-info { flex: 1; }
+    .item-nombre { font-weight: bold; font-size: 14px; margin-bottom: 5px; }
+    .item-codigo { font-size: 11px; color: #999; margin-bottom: 5px; }
+    .item-precio { font-size: 13px; color: #666; }
+    
+    .item-acciones { text-align: right; }
+    .item-subtotal { font-weight: bold; color: #0a7a27; margin-bottom: 5px; }
+    
+    .btn-eliminar {
+      background: #dc3545;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    
+    .total-panel {
+      background: #2c5f2d;
+      color: white;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 20px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .total-label { font-size: 18px; }
+    .total-monto { font-size: 24px; font-weight: bold; }
+    
+    .btn-enviar-panel {
+      width: 100%;
+      background: #0a7a27;
+      color: white;
+      border: none;
+      padding: 15px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-bottom: 10px;
+    }
+    .btn-enviar-panel:hover { background: #085d1e; }
+    
+    .btn-vaciar-panel {
+      width: 100%;
+      background: #999;
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    
+    @media (max-width: 500px) {
+      .panel-carrito { width: 100%; right: -100%; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <div class="header-left">
+        <h1>🏭 Otros Productos</h1>
+        <div class="empresa">NATURALEX - S&F SOLAR GROUP</div>
+      </div>
+      <a href="index.html" class="back-btn">← Volver</a>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="productos" id="listaProductos"></div>
+  </div>
+
+  <div id="panelCarrito" class="panel-carrito">
+    <div class="panel-header">
+      <h2>🛒 Mi Carrito</h2>
+      <button class="btn-cerrar" onclick="cerrarCarrito()">✕</button>
+    </div>
+    
+    <div class="panel-body">
+      <div id="carritoVacio" style="text-align:center; padding:40px; color:#999;">
+        Tu carrito está vacío
+      </div>
+      
+      <div id="carritoContenido" style="display:none;">
+        <div class="cliente-form-panel">
+          <label><strong>Nombre del cliente:</strong></label>
+          <input type="text" id="nombreClientePanel" placeholder="Ingrese nombre">
+        </div>
+        
+        <div id="listaCarritoPanel"></div>
+        
+        <div class="total-panel">
+          <div class="total-label">Total:</div>
+          <div class="total-monto" id="totalCarritoPanel">S/ 0.00</div>
+        </div>
+        
+        <button class="btn-enviar-panel" onclick="enviarPedidoPanel()">📤 Enviar Pedido</button>
+        <button class="btn-vaciar-panel" onclick="if(confirm('¿Vaciar carrito?')) vaciarCarrito()">🗑️ Vaciar Carrito</button>
+      </div>
+    </div>
+  </div>
+
+  <a href="javascript:void(0)" class="carrito-flotante" onclick="abrirCarrito()">
+    🛒 Carrito <span class="badge" id="cantidadCarrito">0</span>
+  </a>
+
+  <script src="carrito.js"></script>
+  <script>
+    const productos = [
+      { codigo: 'BQSB-0224', nombre: 'BROMKISAN BOMBONERA X 60 SOBRES', precio: 95.00 },
+      { codigo: 'GFMB-0286', nombre: 'GENGI FRESH BOMBONERA X 60 SOBRES', precio: 105.00 },
+      { codigo: 'PT-NPBA007', nombre: 'REDO C X 250 GR', precio: 26.50 },
+      { codigo: 'PT-NPBA008', nombre: 'REDO C X 460 GR', precio: 34.00 },
+      { codigo: 'PT-NPES002', nombre: 'CLORURO DE MAGNESIO (CALCIO, MAGNESIO, POTASIO Y CAMÚ CAMÚ) X 250 GR', precio: 29.50 },
+      { codigo: 'PT-NPES004', nombre: 'CITRATO DE MAGNESIO SABOR PIÑA X 250 GR', precio: 29.50 },
+      { codigo: 'DRW-001', nombre: 'PALARTRIC POTE X 500 GR', precio: 71.15 },
+      { codigo: 'DRW-002', nombre: 'PALARTRIC CAJA X 30 SACHET', precio: 67.50 },
+      { codigo: 'DRW-003', nombre: 'WILLSURE FRASCO X 1140 GR', precio: 75.50 },
+      { codigo: 'DRW-004', nombre: 'COLUM SYL C/JA X 30 SACHET', precio: 67.50 },
+      { codigo: 'LSF-001', nombre: 'MAGNESIO COMPLEX C/J X 30 SACHES 5G C/U - Sabor Camu Camu', precio: 27.90 },
+      { codigo: 'LSF-002', nombre: 'VITAMINA C COMPLEX C/J X 30 SACHETS - 5 G C/U - Sabor Naranja', precio: 27.90 },
+      { codigo: 'LSF-003', nombre: 'CALCIO COMPLEX C/J X 30 SACHETS - 5G C/U - Sabor Sandía', precio: 27.90 },
+      { codigo: 'LSF-004', nombre: 'HIERRO COMPLEX C/J X 30 SACHETS - 5G C/U - Sabor Cereza', precio: 27.90 },
+      { codigo: 'LSF-005', nombre: 'ZINC COMPLEX C/J X 30 SACHETS - 5G C/U - Sabor Tutti Frutti', precio: 27.90 },
+      { codigo: 'LSF-006', nombre: 'COMPLEJO B COMPLEX C/J X 30 SACHETS - 5G C/U - Sabor Mandarina', precio: 27.90 },
+      { codigo: 'LSF-007', nombre: 'CITRATO DE MAGNESIO SABOR LIMÓN - C/J X 30 SACHETS - 5G C/U', precio: 27.90 },
+      { codigo: 'LSF-008', nombre: 'CITRATO DE MAGNESIO SABOR PIÑA GOLDEN - C/J X 30 SACHETS - 5G C/U', precio: 27.90 },
+      { codigo: 'JAR-001', nombre: 'JARABE DE PROPÓLEO CON ASMACHILCA, MIEL Y EUCALIPTO X 250 ML', precio: 24.50 },
+      { codigo: 'JAR-002', nombre: 'JARABE DE KIÓN Y MIEL DE ABEJAS X 250 ML', precio: 24.50 },
+      { codigo: 'JAR-003', nombre: 'JARABE DE PROPÓLEO CON AJO Y KION X 250 ML', precio: 24.50 },
+      { codigo: 'JAR-004', nombre: 'JARABE DE MORINGA CON CAMU CAMU X 250 ML', precio: 24.50 }
+    ];
+
+    function renderizarProductos() {
+      const lista = document.getElementById('listaProductos');
+      lista.innerHTML = '';
+
+      productos.forEach(prod => {
+        const cantidad = obtenerCantidadProducto(prod.codigo);
+        
+        const div = document.createElement('div');
+        div.className = 'producto';
+        div.innerHTML = `
+          <div class="producto-codigo">COD: ${prod.codigo}</div>
+          <div class="producto-nombre">${prod.nombre}</div>
+          <div class="producto-precio">S/ ${prod.precio.toFixed(2)}</div>
+          <div class="controles">
+            <button class="btn btn-menos" onclick="quitar('${prod.codigo}')">−</button>
+            <div class="cantidad" id="cant-${prod.codigo}">${cantidad}</div>
+            <button class="btn" onclick="agregar('${prod.codigo}')">+</button>
+          </div>
+        `;
+        lista.appendChild(div);
+      });
+    }
+
+    function agregar(codigo) {
+      const producto = productos.find(p => p.codigo === codigo);
+      agregarAlCarrito(producto);
+      document.getElementById('cant-' + codigo).textContent = obtenerCantidadProducto(codigo);
+    }
+
+    function quitar(codigo) {
+      quitarDelCarrito(codigo);
+      document.getElementById('cant-' + codigo).textContent = obtenerCantidadProducto(codigo);
+    }
+
+    renderizarProductos();
+    actualizarBadgeCarrito();
+  </script>
+</body>
+</html>

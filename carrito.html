@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carrito - NATURALEX</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; background: #f5f5f5; }
+    
+    header { background: #2c5f2d; color: white; padding: 20px; }
+    .header-content { max-width: 1000px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+    .header-left h1 { font-size: 24px; margin-bottom: 5px; }
+    .header-left .empresa { font-size: 12px; opacity: 0.9; }
+    .back-btn { background: rgba(255,255,255,0.2); color: white; padding: 8px 16px; border-radius: 6px; text-decoration: none; }
+    
+    .container { max-width: 1000px; margin: 0 auto; padding: 20px; }
+    
+    .cliente-form { background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+    .cliente-form input { width: 100%; padding: 12px; font-size: 16px; border: 1px solid #ddd; border-radius: 6px; margin-top: 8px; }
+    
+    .item { background: white; padding: 15px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+    .item-info { flex: 1; }
+    .item-nombre { font-weight: bold; margin-bottom: 5px; }
+    .item-codigo { font-size: 12px; color: #999; }
+    .item-precio { color: #0a7a27; font-weight: bold; }
+    
+    .total-box { background: #2c5f2d; color: white; padding: 20px; border-radius: 8px; margin-top: 20px; text-align: center; }
+    .total { font-size: 32px; font-weight: bold; }
+    
+    .btn-enviar { background: #0a7a27; color: white; padding: 15px 30px; border: none; border-radius: 8px; font-size: 18px; cursor: pointer; width: 100%; margin-top: 10px; }
+    .btn-enviar:hover { background: #085d1e; }
+    
+    .vacio { text-align: center; padding: 40px; color: #999; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <div class="header-left">
+        <h1>🛒 Mi Carrito</h1>
+        <div class="empresa">NATURALEX - S&F SOLAR GROUP</div>
+      </div>
+      <a href="index.html" class="back-btn">← Seguir comprando</a>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="cliente-form">
+      <label><strong>Nombre completo del cliente:</strong></label>
+      <input type="text" id="nombreCliente" placeholder="Ingrese nombre" required>
+    </div>
+
+    <div id="listaCarrito"></div>
+
+    <div class="total-box" id="totalBox" style="display:none;">
+      <div class="total" id="totalMonto">S/ 0.00</div>
+      <button class="btn-enviar" onclick="enviarPedido()">📤 Enviar Pedido</button>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-analytics.js";
+    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAfxunq2yqARtsbyavQZM8_XGC47DNNQWk",
+      authDomain: "pedidos-solar-group.firebaseapp.com",
+      projectId: "pedidos-solar-group",
+      storageBucket: "pedidos-solar-group.firebasestorage.app",
+      messagingSenderId: "205423490666",
+      appId: "1:205423490666:web:50c23f6ebe6f1b95f8bc13",
+      measurementId: "G-Q9VW73GGFS"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const db = getFirestore(app);
+
+    window.db = db;
+    window.analytics = analytics;
+  </script>
+
+  <script src="carrito.js"></script>
+  <script>
+    function renderizarCarrito() {
+      const carrito = obtenerCarrito();
+      const lista = document.getElementById('listaCarrito');
+      const totalBox = document.getElementById('totalBox');
+      
+      if (carrito.length === 0) {
+        lista.innerHTML = '<div class="vacio">Tu carrito está vacío<br><a href="index.html">Ir a la tienda</a></div>';
+        totalBox.style.display = 'none';
+        return;
+      }
+
+      lista.innerHTML = '';
+      carrito.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'item';
+        div.innerHTML = `
+          <div class="item-info">
+            <div class="item-nombre">${item.nombre}</div>
+            <div class="item-codigo">COD: ${item.codigo}</div>
+          </div>
+          <div>
+            <div class="item-precio">S/ ${item.precio.toFixed(2)} x ${item.cantidad}</div>
+            <div class="item-precio">= S/ ${(item.precio * item.cantidad).toFixed(2)}</div>
+          </div>
+        `;
+        lista.appendChild(div);
+      });
+
+      const total = calcularTotal();
+      document.getElementById('totalMonto').textContent = 'Total: S/ ' + total.toFixed(2);
+      totalBox.style.display = 'block';
+    }
+
+    window.enviarPedido = async function() {
+      const nombre = document.getElementById('nombreCliente').value.trim();
+      if (!nombre) {
+        alert('⚠️ Ingresa el nombre del cliente');
+        return;
+      }
+
+      const carrito = obtenerCarrito();
+      if (carrito.length === 0) {
+        alert('⚠️ El carrito está vacío');
+        return;
+      }
+
+      const pedido = {
+        fecha: new Date().toISOString(),
+        cliente: nombre,
+        productos: carrito.map(p => ({
+          codigo: p.codigo,
+          nombre: p.nombre,
+          cantidad: p.cantidad,
+          precioUnitario: p.precio,
+          subtotal: p.precio * p.cantidad
+        })),
+        total: calcularTotal(),
+        moneda: 'PEN',
+        estado: 'nuevo'
+      };
+
+      try {
+        const docRef = await addDoc(collection(window.db, 'pedidos'), pedido);
+        alert('✅ Pedido enviado correctamente!\n\nID: ' + docRef.id + '\nTotal: S/ ' + pedido.total.toFixed(2));
+        vaciarCarrito();
+        window.location.href = 'index.html';
+      } catch (e) {
+        console.error(e);
+        alert('❌ Error al enviar: ' + e.message);
+      }
+    };
+
+    renderizarCarrito();
+  </script>
+</body>
+</html>

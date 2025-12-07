@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Concentrados - NATURALEX</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; background: #f5f5f5; }
+    
+    header { background: #2c5f2d; color: white; padding: 20px; }
+    .header-content { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+    .header-left h1 { font-size: 24px; margin-bottom: 5px; }
+    .header-left .empresa { font-size: 12px; opacity: 0.9; }
+    .back-btn { background: rgba(255,255,255,0.2); color: white; padding: 8px 16px; border-radius: 6px; text-decoration: none; }
+    
+    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+    
+    .productos { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+    
+    .producto { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+    .producto-nombre { font-weight: bold; font-size: 16px; margin-bottom: 8px; color: #333; }
+    .producto-codigo { font-size: 12px; color: #999; margin-bottom: 8px; }
+    .producto-precio { font-size: 20px; font-weight: bold; color: #0a7a27; margin: 10px 0; }
+    
+    .controles { display: flex; align-items: center; gap: 10px; margin-top: 15px; }
+    .btn { background: #0a7a27; color: white; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-size: 18px; font-weight: bold; }
+    .btn:hover { background: #085d1e; }
+    .btn-menos { background: #dc3545; }
+    .btn-menos:hover { background: #a02834; }
+    .cantidad { font-size: 18px; font-weight: bold; min-width: 40px; text-align: center; }
+    
+    .carrito-flotante { position: fixed; bottom: 20px; right: 20px; background: #0a7a27; color: white; padding: 15px 25px; border-radius: 50px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); cursor: pointer; font-weight: bold; text-decoration: none; }
+    .carrito-flotante:hover { background: #085d1e; }
+    .badge { background: red; border-radius: 50%; padding: 2px 8px; font-size: 12px; margin-left: 8px; }
+
+    .panel-carrito {
+      position: fixed;
+      top: 0;
+      right: -450px;
+      width: 450px;
+      height: 100vh;
+      background: white;
+      box-shadow: -4px 0 12px rgba(0,0,0,0.2);
+      transition: right 0.3s ease;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .panel-carrito.abierto { right: 0; }
+    
+    .panel-header {
+      background: #2c5f2d;
+      color: white;
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .panel-header h2 { margin: 0; font-size: 20px; }
+    
+    .btn-cerrar {
+      background: rgba(255,255,255,0.2);
+      border: none;
+      color: white;
+      font-size: 24px;
+      cursor: pointer;
+      padding: 5px 12px;
+      border-radius: 4px;
+    }
+    
+    .panel-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+    }
+    
+    .cliente-form-panel { margin-bottom: 20px; }
+    .cliente-form-panel input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      margin-top: 5px;
+    }
+    
+    .item-carrito {
+      background: #f9f9f9;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+    
+    .item-info { flex: 1; }
+    .item-nombre { font-weight: bold; font-size: 14px; margin-bottom: 5px; }
+    .item-codigo { font-size: 11px; color: #999; margin-bottom: 5px; }
+    .item-precio { font-size: 13px; color: #666; }
+    
+    .item-acciones { text-align: right; }
+    .item-subtotal { font-weight: bold; color: #0a7a27; margin-bottom: 5px; }
+    
+    .btn-eliminar {
+      background: #dc3545;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    
+    .total-panel {
+      background: #2c5f2d;
+      color: white;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 20px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .total-label { font-size: 18px; }
+    .total-monto { font-size: 24px; font-weight: bold; }
+    
+    .btn-enviar-panel {
+      width: 100%;
+      background: #0a7a27;
+      color: white;
+      border: none;
+      padding: 15px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-bottom: 10px;
+    }
+    .btn-enviar-panel:hover { background: #085d1e; }
+    
+    .btn-vaciar-panel {
+      width: 100%;
+      background: #999;
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    
+    @media (max-width: 500px) {
+      .panel-carrito { width: 100%; right: -100%; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <div class="header-left">
+        <h1>🧪 Concentrados y Extractos</h1>
+        <div class="empresa">NATURALEX - S&F SOLAR GROUP</div>
+      </div>
+      <a href="index.html" class="back-btn">← Volver</a>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="productos" id="listaProductos"></div>
+  </div>
+
+  <div id="panelCarrito" class="panel-carrito">
+    <div class="panel-header">
+      <h2>🛒 Mi Carrito</h2>
+      <button class="btn-cerrar" onclick="cerrarCarrito()">✕</button>
+    </div>
+    
+    <div class="panel-body">
+      <div id="carritoVacio" style="text-align:center; padding:40px; color:#999;">
+        Tu carrito está vacío
+      </div>
+      
+      <div id="carritoContenido" style="display:none;">
+        <div class="cliente-form-panel">
+          <label><strong>Nombre del cliente:</strong></label>
+          <input type="text" id="nombreClientePanel" placeholder="Ingrese nombre">
+        </div>
+        
+        <div id="listaCarritoPanel"></div>
+        
+        <div class="total-panel">
+          <div class="total-label">Total:</div>
+          <div class="total-monto" id="totalCarritoPanel">S/ 0.00</div>
+        </div>
+        
+        <button class="btn-enviar-panel" onclick="enviarPedidoPanel()">📤 Enviar Pedido</button>
+        <button class="btn-vaciar-panel" onclick="if(confirm('¿Vaciar carrito?')) vaciarCarrito()">🗑️ Vaciar Carrito</button>
+      </div>
+    </div>
+  </div>
+
+  <a href="javascript:void(0)" class="carrito-flotante" onclick="abrirCarrito()">
+    🛒 Carrito <span class="badge" id="cantidadCarrito">0</span>
+  </a>
+
+  <script src="carrito.js"></script>
+  <script>
+    const productos = [
+      { codigo: 'PT-NLEX037', nombre: 'CONCENTRADO DE ALCACHOFA C/CAMU CAMU X 600 ML', precio: 29.50 },
+      { codigo: 'PT-NLEX032', nombre: 'CONCENTRADO PENCA DE TUNA X 600 ML', precio: 29.50 },
+      { codigo: 'PT-NLEX036', nombre: 'CONCENTRADO DE UÑA DE GATO CON CAMU CAMU X 600 ML', precio: 29.50 },
+      { codigo: 'PT-NLEX034', nombre: 'CONCENTRADO DE YACON (CARAMBOLA Y CANELA) X 600 ML', precio: 29.50 },
+      { codigo: 'PT-NLEX038', nombre: 'CONCENTRADO DE ALOE CON PIÑA X 600 ML', precio: 29.50 },
+      { codigo: 'PT-NLEX043', nombre: 'CONCENTRADO DE HUANARPO MACHO (MACA NEGRA, ALGARROBINA) X 600 ML', precio: 29.50 },
+      { codigo: 'PT-NLEX044', nombre: 'CONCENTRADO VITAL HOMBRE - ACHIOTE, MUSHUA, UÑA DE GATO X 600 ML', precio: 29.50 },
+      { codigo: 'PT-NLEX039', nombre: 'CONCENTRADO DE NONI CON SABILA X 600 ML', precio: 29.50 },
+      { codigo: 'PT-NLEX035', nombre: 'CONCENTRADO COLON LAX C/TAMARINDO (CIRUELA, LINAZA, PIÑA) X 600 ML', precio: 29.50 },
+      { codigo: 'PT-NLEX040', nombre: 'CONCENTRADO DE HEPAPLUS (AGRACEJO, BOLDO, COLA DE CABALLO) X 600 ML', precio: 29.50 },
+      { codigo: 'PT-NLEX041', nombre: 'CONCENTRADO DE CLOROFILA (MENTA, ALFALFA, HIERBA BUENA) X 600 ML', precio: 39.50 },
+      { codigo: 'PT-NLEX042', nombre: 'CONCENTRADO DE MORINGA CON CAMU CAMU X 600 ML', precio: 29.50 },
+      { codigo: 'PT-NLEX045', nombre: 'CONCENTRADO MANGLE ROJO (PAPAYA, LINAZA, SANGRE DE GRADO) X 600 ML', precio: 29.50 },
+      { codigo: 'PT-NLEX046', nombre: 'CONCENTRADO RENAL (CHANCA PIEDRA, PIÑA, COLA DE CABALLO) X 600 ML', precio: 29.50 },
+      { codigo: 'PT-NLEX047', nombre: 'CONCENTRADO FEMINAX (MANAYUPA, FLOR DE ARENA, ARANDANOS) X 600 ML', precio: 29.50 },
+      { codigo: 'PT-NLEX048', nombre: 'CONCENTRADO DE CEREBRAIN (MACA NEGRA, ALGARROBINA, MIEL) X 600 ML', precio: 29.50 },
+      { codigo: 'PT-NLEX049', nombre: 'CONCENTRADO DE PROPOLEO - AJO Y KION X 600 ML', precio: 40.50 },
+      { codigo: 'PT-NLEX050', nombre: 'CONCENTRADO VALERIANA (LIMON, HIERBA LUISA, MANZANILLA) X 600 ML', precio: 29.50 },
+      { codigo: 'EXT-001', nombre: 'EXTRACTO DE ALCACHOFA CON CAMU CAMU X 1200ML', precio: 59.50 },
+      { codigo: 'EXT-002', nombre: 'EXTRACTO DE SABILA CON CAMU CAMU X 1200ML', precio: 59.50 },
+      { codigo: 'EXT-003', nombre: 'EXTRACTO DE UÑA DE GATO Y CAMU CAMU X 1200ML', precio: 59.50 },
+      { codigo: 'EXT-004', nombre: 'EXTRACTO DE NONI CON UÑA DE GATO Y CAMU CAMU X 1200ML', precio: 59.50 },
+      { codigo: 'EXT-005', nombre: 'EXTRACTO DE MORINGA CON CAMU CAMU X 1200ML', precio: 62.50 },
+      { codigo: 'EXT-006', nombre: 'EXTRACTO DE CLEARLAX X 1200ML', precio: 59.50 },
+      { codigo: 'EXT-007', nombre: 'EXTRACTO DE HEPALAB - AGRACEJO, BOLDO, COLA DE CABALLO X 1200ML', precio: 59.50 },
+      { codigo: 'EXT-008', nombre: 'EXTRACTO DE CLOROFILA X 1200ML', precio: 70.50 }
+    ];
+
+    function renderizarProductos() {
+      const lista = document.getElementById('listaProductos');
+      lista.innerHTML = '';
+
+      productos.forEach(prod => {
+        const cantidad = obtenerCantidadProducto(prod.codigo);
+        
+        const div = document.createElement('div');
+        div.className = 'producto';
+        div.innerHTML = `
+          <div class="producto-codigo">COD: ${prod.codigo}</div>
+          <div class="producto-nombre">${prod.nombre}</div>
+          <div class="producto-precio">S/ ${prod.precio.toFixed(2)}</div>
+          <div class="controles">
+            <button class="btn btn-menos" onclick="quitar('${prod.codigo}')">−</button>
+            <div class="cantidad" id="cant-${prod.codigo}">${cantidad}</div>
+            <button class="btn" onclick="agregar('${prod.codigo}')">+</button>
+          </div>
+        `;
+        lista.appendChild(div);
+      });
+    }
+
+    function agregar(codigo) {
+      const producto = productos.find(p => p.codigo === codigo);
+      agregarAlCarrito(producto);
+      document.getElementById('cant-' + codigo).textContent = obtenerCantidadProducto(codigo);
+    }
+
+    function quitar(codigo) {
+      quitarDelCarrito(codigo);
+      document.getElementById('cant-' + codigo).textContent = obtenerCantidadProducto(codigo);
+    }
+
+    renderizarProductos();
+    actualizarBadgeCarrito();
+  </script>
+</body>
+</html>
