@@ -12,7 +12,7 @@
     .header-content { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
     .btn-volver { background: rgba(255,255,255,0.2); color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; }
     .carrito-btn { background: white; color: #2c5f2d; border: none; padding: 12px 20px; border-radius: 25px; cursor: pointer; font-weight: bold; }
-    .badge { background: red; color: white; border-radius: 50%; padding: 2px 6px; font-size: 12px; margin-left: 5px; display: none; }
+    .badge { background: red; color: white; border-radius: 50%; padding: 2px 6px; font-size: 12px; margin-left: 5px; }
     
     .container { max-width: 1200px; margin: 30px auto; padding: 20px; }
     .titulo-categoria { text-align: center; margin-bottom: 30px; color: #2c5f2d; }
@@ -31,6 +31,84 @@
     .btn-cantidad { background: #2c5f2d; color: white; border: none; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; font-size: 18px; }
     .btn-cantidad:hover { background: #1e4620; }
     .cantidad { width: 50px; text-align: center; font-size: 18px; font-weight: bold; }
+
+    /* CARRITO LATERAL */
+    #panelCarrito {
+      position: fixed;
+      top: 0;
+      right: -400px;
+      width: 400px;
+      height: 100vh;
+      background: white;
+      box-shadow: -4px 0 15px rgba(0,0,0,0.3);
+      transition: right 0.3s ease;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+    }
+    #panelCarrito.activo { right: 0; }
+    .carrito-header {
+      background: #2c5f2d;
+      color: white;
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .btn-cerrar {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 28px;
+      cursor: pointer;
+      line-height: 1;
+    }
+    .carrito-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+    }
+    .carrito-item {
+      border-bottom: 1px solid #eee;
+      padding: 15px 0;
+    }
+    .carrito-item h4 { color: #2c5f2d; font-size: 14px; margin-bottom: 5px; }
+    .carrito-item .detalle { color: #666; font-size: 13px; margin: 5px 0; }
+    .carrito-item .subtotal { color: #e74c3c; font-weight: bold; margin-top: 5px; }
+    .carrito-footer {
+      border-top: 2px solid #2c5f2d;
+      padding: 20px;
+      background: #f9f9f9;
+    }
+    .total-general { font-size: 22px; font-weight: bold; color: #2c5f2d; margin-bottom: 15px; }
+    .form-group { margin-bottom: 15px; }
+    .form-group label { display: block; margin-bottom: 5px; color: #333; font-weight: bold; }
+    .form-group input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
+    .btn-enviar {
+      width: 100%;
+      padding: 15px;
+      background: #2c5f2d;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .btn-enviar:hover { background: #1e4620; }
+    .carrito-vacio { text-align: center; color: #999; padding: 40px 20px; }
+    
+    #overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      z-index: 999;
+    }
+    #overlay.activo { display: block; }
   </style>
 </head>
 <body>
@@ -39,7 +117,7 @@
       <a href="index.html" class="btn-volver">← Volver</a>
       <h1>🏥 Dr. Willphar</h1>
       <button class="carrito-btn" onclick="toggleCarrito()">
-        🛒 <span id="badgeCarrito" class="badge">0</span>
+        🛒 <span id="badgeCarrito" class="badge" style="display:none;">0</span>
       </button>
     </div>
   </header>
@@ -47,6 +125,26 @@
   <div class="container">
     <h2 class="titulo-categoria">Línea Dr. Willphar</h2>
     <div class="productos" id="listaProductos"></div>
+  </div>
+
+  <!-- OVERLAY -->
+  <div id="overlay" onclick="toggleCarrito()"></div>
+
+  <!-- PANEL CARRITO -->
+  <div id="panelCarrito">
+    <div class="carrito-header">
+      <h2>🛒 Carrito</h2>
+      <button class="btn-cerrar" onclick="toggleCarrito()">×</button>
+    </div>
+    <div class="carrito-body" id="listaCarrito"></div>
+    <div class="carrito-footer">
+      <div class="total-general" id="totalGeneral">Total: S/ 0.00</div>
+      <div class="form-group">
+        <label>Nombre del cliente:</label>
+        <input type="text" id="nombreCliente" placeholder="Ingrese nombre">
+      </div>
+      <button class="btn-enviar" onclick="enviarPedido()">📤 Enviar Pedido</button>
+    </div>
   </div>
 
   <script src="carrito.js"></script>
