@@ -2,7 +2,6 @@
 
 let carrito = JSON.parse(localStorage.getItem('carrito')) || {};
 
-// Agregar o actualizar producto en el carrito
 function agregarAlCarrito(codigo, nombre, precio, cantidad) {
   carrito[codigo] = {
     nombre: nombre,
@@ -14,7 +13,6 @@ function agregarAlCarrito(codigo, nombre, precio, cantidad) {
   renderizarCarrito();
 }
 
-// Eliminar producto del carrito
 function eliminarDelCarrito(codigo) {
   delete carrito[codigo];
   localStorage.setItem('carrito', JSON.stringify(carrito));
@@ -22,7 +20,6 @@ function eliminarDelCarrito(codigo) {
   renderizarCarrito();
 }
 
-// Actualizar el badge del carrito (número de productos)
 function actualizarBadgeCarrito() {
   const badge = document.getElementById('badgeCarrito');
   const totalItems = Object.keys(carrito).length;
@@ -37,7 +34,6 @@ function actualizarBadgeCarrito() {
   }
 }
 
-// Toggle para abrir/cerrar el carrito lateral
 function toggleCarrito() {
   const panel = document.getElementById('panelCarrito');
   const overlay = document.getElementById('overlay');
@@ -49,7 +45,6 @@ function toggleCarrito() {
   }
 }
 
-// Renderizar contenido del carrito
 function renderizarCarrito() {
   const lista = document.getElementById('listaCarrito');
   const totalElement = document.getElementById('totalGeneral');
@@ -83,7 +78,6 @@ function renderizarCarrito() {
   }
 }
 
-// Enviar pedido a Firebase
 async function enviarPedido() {
   const nombreCliente = document.getElementById('nombreCliente');
   
@@ -99,7 +93,6 @@ async function enviarPedido() {
     return;
   }
   
-  // Calcular total
   let total = 0;
   const productos = items.map(([codigo, item]) => {
     const subtotal = item.precio * item.cantidad;
@@ -122,30 +115,24 @@ async function enviarPedido() {
   };
   
   try {
-    // Importar Firebase Firestore
     const { getFirestore, collection, addDoc } = await import('https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js');
     const { getApp } = await import('https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js');
     
-    // Usar la app ya inicializada
     const app = getApp();
     const db = getFirestore(app);
     
-    // Guardar en Firestore
     await addDoc(collection(db, 'pedidos'), pedido);
     
     alert('✅ Pedido enviado correctamente');
     
-    // Limpiar carrito
     carrito = {};
     localStorage.removeItem('carrito');
     nombreCliente.value = '';
     
-    // Actualizar interfaz
     actualizarBadgeCarrito();
     renderizarCarrito();
     toggleCarrito();
     
-    // Resetear cantidades en la página actual
     document.querySelectorAll('.cantidad').forEach(span => {
       span.textContent = '0';
     });
@@ -156,7 +143,6 @@ async function enviarPedido() {
   }
 }
 
-// Inicializar al cargar la página
 document.addEventListener('DOMContentLoaded', function() {
   actualizarBadgeCarrito();
   renderizarCarrito();
