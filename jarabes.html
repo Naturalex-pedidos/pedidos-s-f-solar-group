@@ -32,7 +32,6 @@
     .btn-cantidad:hover { background: #1e4620; }
     .cantidad { width: 50px; text-align: center; font-size: 18px; font-weight: bold; }
 
-    /* CARRITO LATERAL */
     #panelCarrito {
       position: fixed;
       top: 0;
@@ -127,10 +126,8 @@
     <div class="productos" id="listaProductos"></div>
   </div>
 
-  <!-- OVERLAY -->
   <div id="overlay" onclick="toggleCarrito()"></div>
 
-  <!-- PANEL CARRITO -->
   <div id="panelCarrito">
     <div class="carrito-header">
       <h2>🛒 Carrito</h2>
@@ -146,6 +143,24 @@
       <button class="btn-enviar" onclick="enviarPedido()">📤 Enviar Pedido</button>
     </div>
   </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-analytics.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAfxunq2yqARtsbyavQZM8_XGC47DNNQWk",
+      authDomain: "pedidos-solar-group.firebaseapp.com",
+      projectId: "pedidos-solar-group",
+      storageBucket: "pedidos-solar-group.firebasestorage.app",
+      messagingSenderId: "205423490666",
+      appId: "1:205423490666:web:50c23f6ebe6f1b95f8bc13",
+      measurementId: "G-Q9VW73GGFS"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+  </script>
 
   <script src="carrito.js"></script>
   <script>
