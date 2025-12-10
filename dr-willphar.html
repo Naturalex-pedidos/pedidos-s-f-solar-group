@@ -12,6 +12,7 @@
     .header-content { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
     .btn-volver { background: rgba(255,255,255,0.2); color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; }
     .carrito-btn { background: white; color: #2c5f2d; border: none; padding: 12px 20px; border-radius: 25px; cursor: pointer; font-weight: bold; }
+    .badge { background: red; color: white; border-radius: 50%; padding: 2px 6px; font-size: 12px; margin-left: 5px; display: none; }
     
     .container { max-width: 1200px; margin: 30px auto; padding: 20px; }
     .titulo-categoria { text-align: center; margin-bottom: 30px; color: #2c5f2d; }
@@ -23,11 +24,12 @@
       border-radius: 10px;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
-    .producto h3 { color: #2c5f2d; font-size: 16px; margin-bottom: 10px; }
+    .producto h3 { color: #2c5f2d; font-size: 16px; margin-bottom: 10px; min-height: 60px; }
     .producto .precio { color: #e74c3c; font-size: 20px; font-weight: bold; margin: 10px 0; }
     .producto .codigo { color: #999; font-size: 12px; margin-bottom: 10px; }
     .controles { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 15px; }
     .btn-cantidad { background: #2c5f2d; color: white; border: none; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; font-size: 18px; }
+    .btn-cantidad:hover { background: #1e4620; }
     .cantidad { width: 50px; text-align: center; font-size: 18px; font-weight: bold; }
   </style>
 </head>
@@ -37,7 +39,7 @@
       <a href="index.html" class="btn-volver">← Volver</a>
       <h1>🏥 Dr. Willphar</h1>
       <button class="carrito-btn" onclick="toggleCarrito()">
-        🛒 <span id="badgeCarrito" class="badge" style="display:none;">0</span>
+        🛒 <span id="badgeCarrito" class="badge">0</span>
       </button>
     </div>
   </header>
@@ -50,8 +52,10 @@
   <script src="carrito.js"></script>
   <script>
     const productos = [
-      // Agrega aquí los productos de Dr. Willphar con este formato:
-      // { codigo: "DW001", nombre: "Producto ejemplo", precio: 50.00 }
+      { codigo: "1090", nombre: "PALARTRIC POTE X 500 GR", precio: 71.15 },
+      { codigo: "1111", nombre: "PALARTRIC CAJA X 30 SACHET", precio: 67.50 },
+      { codigo: "1112", nombre: "WILLSURE FRASCO X 1140 GR", precio: 75.50 },
+      { codigo: "1113", nombre: "COLUM SYL CAJA X 30 SACHET", precio: 67.50 }
     ];
 
     function renderizarProductos() {
