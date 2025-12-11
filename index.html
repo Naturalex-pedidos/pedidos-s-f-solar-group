@@ -3,158 +3,148 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NATURALEX - S&F Solar Group</title>
+  <title>Panel Admin - NATURALEX</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: Arial, sans-serif; background: #f5f5f5; }
     
-    header { background: #2c5f2d; color: white; padding: 20px; text-align: center; position: relative; }
-    header h1 { font-size: 28px; margin-bottom: 5px; }
-    header p { font-size: 14px; opacity: 0.9; }
-    
-    .carrito-btn {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      background: white;
-      color: #2c5f2d;
-      border: none;
-      padding: 12px 20px;
-      border-radius: 25px;
-      cursor: pointer;
-      font-size: 16px;
-      font-weight: bold;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-    }
-    .carrito-btn:hover { background: #f0f0f0; }
-    .badge {
-      background: red;
+    header {
+      background: #2c5f2d;
       color: white;
-      border-radius: 50%;
-      padding: 2px 6px;
-      font-size: 12px;
-      margin-left: 5px;
-    }
-    
-    .categorias {
-      max-width: 1200px;
-      margin: 40px auto;
       padding: 20px;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header h1 { font-size: 24px; }
+    .btn-logout {
+      background: rgba(255,255,255,0.2);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .btn-logout:hover { background: rgba(255,255,255,0.3); }
+    
+    .container {
+      max-width: 1400px;
+      margin: 30px auto;
+      padding: 20px;
     }
     
-    .categoria-card {
+    .filtros {
       background: white;
-      border-radius: 15px;
-      padding: 30px;
-      text-align: center;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-      transition: transform 0.3s, box-shadow 0.3s;
-      cursor: pointer;
-      text-decoration: none;
-      color: inherit;
-      display: block;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
-    .categoria-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 8px 15px rgba(0,0,0,0.2);
-    }
-    .categoria-icon {
-      font-size: 60px;
-      margin-bottom: 15px;
-    }
-    .categoria-card h3 {
-      color: #2c5f2d;
-      font-size: 22px;
-      margin-bottom: 10px;
-    }
-    .categoria-info {
-      color: #666;
+    .filtros h3 { margin-bottom: 15px; color: #2c5f2d; }
+    .filtros select, .filtros input {
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      margin-right: 10px;
       font-size: 14px;
     }
     
-    .admin-link {
-      text-align: center;
-      margin: 30px 0;
+    .pedidos {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      overflow: hidden;
     }
-    .admin-link a {
-      color: #2c5f2d;
-      text-decoration: none;
+    .pedido-item {
+      border-bottom: 1px solid #eee;
+      padding: 20px;
+    }
+    .pedido-item:last-child { border-bottom: none; }
+    .pedido-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    .pedido-cliente { font-size: 18px; font-weight: bold; color: #2c5f2d; }
+    .pedido-fecha { color: #666; font-size: 14px; }
+    .pedido-estado {
+      padding: 5px 15px;
+      border-radius: 20px;
+      font-size: 12px;
       font-weight: bold;
-      padding: 10px 20px;
-      border: 2px solid #2c5f2d;
-      border-radius: 8px;
-      display: inline-block;
     }
-    .admin-link a:hover {
+    .estado-pendiente { background: #fff3cd; color: #856404; }
+    .estado-completado { background: #d4edda; color: #155724; }
+    .estado-cancelado { background: #f8d7da; color: #721c24; }
+    
+    .productos-pedido {
+      background: #f9f9f9;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+    .producto-linea {
+      padding: 5px 0;
+      color: #333;
+      font-size: 14px;
+    }
+    .pedido-total {
+      text-align: right;
+      font-size: 20px;
+      font-weight: bold;
+      color: #e74c3c;
+      margin-top: 10px;
+    }
+    .pedido-vendedor {
+      color: #666;
+      font-size: 14px;
+      margin-top: 5px;
+    }
+    
+    .sin-pedidos {
+      text-align: center;
+      padding: 60px 20px;
+      color: #999;
+      font-size: 18px;
+    }
+    
+    .btn-cambiar-estado {
+      padding: 8px 15px;
       background: #2c5f2d;
       color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+      margin-right: 10px;
     }
+    .btn-cambiar-estado:hover { background: #1e4620; }
   </style>
 </head>
 <body>
   <header>
-    <h1>🌿 NATURALEX</h1>
-    <p>S&F Solar Group - Productos Naturales</p>
-    <button class="carrito-btn" onclick="toggleCarrito()">
-      🛒 Carrito <span id="badgeCarrito" class="badge" style="display:none;">0</span>
-    </button>
+    <h1>📊 Panel de Administración - NATURALEX</h1>
+    <button class="btn-logout" onclick="cerrarSesion()">🚪 Cerrar Sesión</button>
   </header>
 
-  <div class="categorias">
-    <a href="colagenos.html" class="categoria-card">
-      <div class="categoria-icon">💊</div>
-      <h3>Colágenos</h3>
-      <div class="categoria-info">6 productos · Desde S/ 68.50</div>
-    </a>
+  <div class="container">
+    <div class="filtros">
+      <h3>Filtrar Pedidos</h3>
+      <select id="filtroEstado" onchange="cargarPedidos()">
+        <option value="todos">Todos los estados</option>
+        <option value="pendiente">Pendientes</option>
+        <option value="completado">Completados</option>
+        <option value="cancelado">Cancelados</option>
+      </select>
+      <input type="date" id="filtroFecha" onchange="cargarPedidos()">
+      <button class="btn-cambiar-estado" onclick="cargarPedidos()">🔄 Actualizar</button>
+    </div>
 
-    <a href="capsulas.html" class="categoria-card">
-      <div class="categoria-icon">💊</div>
-      <h3>Cápsulas x100</h3>
-      <div class="categoria-info">16 productos · Desde S/ 29.50</div>
-    </a>
-
-    <a href="nutricional.html" class="categoria-card">
-      <div class="categoria-icon">🥤</div>
-      <h3>Nutricionales</h3>
-      <div class="categoria-info">7 productos · Desde S/ 41.50</div>
-    </a>
-
-    <a href="concentrados.html" class="categoria-card">
-      <div class="categoria-icon">🧪</div>
-      <h3>Concentrados</h3>
-      <div class="categoria-info">26 productos · Desde S/ 29.50</div>
-    </a>
-
-    <a href="dr-willphar.html" class="categoria-card">
-      <div class="categoria-icon">🏥</div>
-      <h3>Dr. Willphar</h3>
-      <div class="categoria-info">Línea médica especializada</div>
-    </a>
-
-    <a href="lsf.html" class="categoria-card">
-      <div class="categoria-icon">🌟</div>
-      <h3>LSF</h3>
-      <div class="categoria-info">Productos premium</div>
-    </a>
-
-    <a href="jarabes.html" class="categoria-card">
-      <div class="categoria-icon">🍯</div>
-      <h3>Jarabes</h3>
-      <div class="categoria-info">Jarabes naturales</div>
-    </a>
-
-    <a href="el-mana.html" class="categoria-card">
-      <div class="categoria-icon">🌿</div>
-      <h3>Productos El Mana</h3>
-      <div class="categoria-info">Bromkisan y Gengifresh</div>
-    </a>
-  </div>
-
-  <div class="admin-link">
-    <a href="login.html">🔐 Acceso Administrador</a>
+    <div class="pedidos" id="listaPedidos">
+      <div class="sin-pedidos">Cargando pedidos...</div>
+    </div>
   </div>
 
   <!-- Firebase Configuration -->
@@ -176,9 +166,145 @@
     const analytics = getAnalytics(app);
   </script>
 
-  <script src="carrito.js"></script>
   <script>
-    actualizarBadgeCarrito();
+    // Verificar permisos al cargar
+    function verificarPermisos() {
+      const userSession = JSON.parse(localStorage.getItem('userSession'));
+      
+      if (!userSession) {
+        alert('⛔ Debe iniciar sesión para acceder al panel de administración');
+        window.location.href = 'login.html';
+        return false;
+      }
+      
+      // Verificar que sea admin o vendedor
+      if (userSession.rol !== 'admin' && userSession.rol !== 'vendedor') {
+        alert('⛔ No tiene permisos para acceder a esta página');
+        window.location.href = 'index.html';
+        return false;
+      }
+      
+      return true;
+    }
+
+    // Cargar pedidos desde Firebase
+    async function cargarPedidos() {
+      if (!verificarPermisos()) return;
+      
+      const lista = document.getElementById('listaPedidos');
+      lista.innerHTML = '<div class="sin-pedidos">Cargando pedidos...</div>';
+      
+      try {
+        const { getFirestore, collection, getDocs, query, orderBy } = await import('https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js');
+        const { getApp } = await import('https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js');
+        
+        const app = getApp();
+        const db = getFirestore(app);
+        
+        const q = query(collection(db, 'pedidos'), orderBy('fecha', 'desc'));
+        const querySnapshot = await getDocs(q);
+        
+        if (querySnapshot.empty) {
+          lista.innerHTML = '<div class="sin-pedidos">📦 No hay pedidos registrados</div>';
+          return;
+        }
+        
+        const filtroEstado = document.getElementById('filtroEstado').value;
+        const filtroFecha = document.getElementById('filtroFecha').value;
+        
+        let pedidos = [];
+        querySnapshot.forEach((doc) => {
+          const pedido = { id: doc.id, ...doc.data() };
+          
+          // Aplicar filtros
+          if (filtroEstado !== 'todos' && pedido.estado !== filtroEstado) return;
+          if (filtroFecha && !pedido.fecha.startsWith(filtroFecha)) return;
+          
+          pedidos.push(pedido);
+        });
+        
+        if (pedidos.length === 0) {
+          lista.innerHTML = '<div class="sin-pedidos">📦 No se encontraron pedidos con los filtros aplicados</div>';
+          return;
+        }
+        
+        lista.innerHTML = pedidos.map(pedido => {
+          const fecha = new Date(pedido.fecha);
+          const fechaFormato = fecha.toLocaleDateString('es-PE') + ' ' + fecha.toLocaleTimeString('es-PE');
+          
+          const productosHTML = pedido.productos.map(p => 
+            `<div class="producto-linea">
+              ${p.cantidad}x ${p.nombre} - S/ ${p.subtotal.toFixed(2)}
+            </div>`
+          ).join('');
+          
+          const estadoClass = `estado-${pedido.estado || 'pendiente'}`;
+          const vendedorHTML = pedido.vendedor ? `<div class="pedido-vendedor">👤 Vendedor: ${pedido.vendedor}</div>` : '';
+          
+          return `
+            <div class="pedido-item">
+              <div class="pedido-header">
+                <div>
+                  <div class="pedido-cliente">🧑 ${pedido.cliente}</div>
+                  <div class="pedido-fecha">📅 ${fechaFormato}</div>
+                  ${vendedorHTML}
+                </div>
+                <span class="pedido-estado ${estadoClass}">${(pedido.estado || 'pendiente').toUpperCase()}</span>
+              </div>
+              <div class="productos-pedido">
+                ${productosHTML}
+              </div>
+              <div class="pedido-total">Total: S/ ${pedido.total.toFixed(2)}</div>
+              <div style="margin-top: 15px;">
+                <button class="btn-cambiar-estado" onclick="cambiarEstado('${pedido.id}', 'completado')">✅ Completar</button>
+                <button class="btn-cambiar-estado" onclick="cambiarEstado('${pedido.id}', 'cancelado')" style="background: #dc3545;">❌ Cancelar</button>
+              </div>
+            </div>
+          `;
+        }).join('');
+        
+      } catch (error) {
+        console.error('Error al cargar pedidos:', error);
+        lista.innerHTML = '<div class="sin-pedidos">❌ Error al cargar pedidos: ' + error.message + '</div>';
+      }
+    }
+
+    // Cambiar estado de pedido
+    async function cambiarEstado(pedidoId, nuevoEstado) {
+      if (!confirm(`¿Cambiar estado a ${nuevoEstado}?`)) return;
+      
+      try {
+        const { getFirestore, doc, updateDoc } = await import('https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js');
+        const { getApp } = await import('https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js');
+        
+        const app = getApp();
+        const db = getFirestore(app);
+        
+        await updateDoc(doc(db, 'pedidos', pedidoId), {
+          estado: nuevoEstado
+        });
+        
+        alert('✅ Estado actualizado correctamente');
+        cargarPedidos();
+        
+      } catch (error) {
+        console.error('Error al cambiar estado:', error);
+        alert('❌ Error al cambiar estado: ' + error.message);
+      }
+    }
+
+    // Cerrar sesión
+    function cerrarSesion() {
+      if (confirm('¿Cerrar sesión?')) {
+        localStorage.removeItem('userSession');
+        window.location.href = 'login.html';
+      }
+    }
+
+    // Verificar permisos y cargar pedidos al iniciar
+    if (verificarPermisos()) {
+      cargarPedidos();
+    }
   </script>
 </body>
 </html>
