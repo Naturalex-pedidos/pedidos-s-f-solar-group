@@ -3,11 +3,17 @@
 let carrito = JSON.parse(localStorage.getItem('carrito')) || {};
 
 function agregarAlCarrito(codigo, nombre, precio, cantidad) {
+  if (cantidad <= 0) {
+    eliminarDelCarrito(codigo);
+    return;
+  }
+  
   carrito[codigo] = {
     nombre: nombre,
     precio: precio,
     cantidad: cantidad
   };
+  
   localStorage.setItem('carrito', JSON.stringify(carrito));
   actualizarBadgeCarrito();
   renderizarCarrito();
@@ -39,9 +45,16 @@ function toggleCarrito() {
   const overlay = document.getElementById('overlay');
   
   if (panel && overlay) {
-    panel.classList.toggle('activo');
-    overlay.classList.toggle('activo');
-    renderizarCarrito();
+    const estaActivo = panel.classList.contains('activo');
+    
+    if (estaActivo) {
+      panel.classList.remove('activo');
+      overlay.classList.remove('activo');
+    } else {
+      panel.classList.add('activo');
+      overlay.classList.add('activo');
+      renderizarCarrito();
+    }
   }
 }
 
@@ -51,6 +64,8 @@ function renderizarCarrito() {
   
   if (!lista) return;
   
+  // Recargar carrito desde localStorage
+  carrito = JSON.parse(localStorage.getItem('carrito')) || {};
   const items = Object.entries(carrito);
   
   if (items.length === 0) {
@@ -86,6 +101,8 @@ async function enviarPedido() {
     return;
   }
   
+  // Recargar carrito desde localStorage
+  carrito = JSON.parse(localStorage.getItem('carrito')) || {};
   const items = Object.entries(carrito);
   
   if (items.length === 0) {
@@ -106,12 +123,17 @@ async function enviarPedido() {
     };
   });
   
+  // Obtener vendedor si existe
+  const userSession = JSON.parse(localStorage.getItem('userSession'));
+  const vendedor = userSession ? userSession.nombre : null;
+  
   const pedido = {
     cliente: nombreCliente.value.trim(),
     productos: productos,
     total: total,
     fecha: new Date().toISOString(),
-    estado: 'pendiente'
+    estado: 'pendiente',
+    vendedor: vendedor
   };
   
   try {
@@ -125,14 +147,17 @@ async function enviarPedido() {
     
     alert('✅ Pedido enviado correctamente');
     
+    // Limpiar carrito
     carrito = {};
     localStorage.removeItem('carrito');
     nombreCliente.value = '';
     
+    // Actualizar interfaz
     actualizarBadgeCarrito();
     renderizarCarrito();
     toggleCarrito();
     
+    // Resetear cantidades en la página actual
     document.querySelectorAll('.cantidad').forEach(span => {
       span.textContent = '0';
     });
@@ -143,7 +168,35 @@ async function enviarPedido() {
   }
 }
 
+// Sincronizar cantidades de productos con el carrito al cargar la página
+function sincronizarCantidades() {
+  carrito = JSON.parse(localStorage.getItem('carrito')) || {};
+  
+  // Si hay una función de productos en la página
+  if (typeof productos !== 'undefined') {
+    productos.forEach((producto, index) => {
+      const span = document.getElementById('cant' + index);
+      if (span && carrito[producto.codigo]) {
+        span.textContent = carrito[producto.codigo].cantidad;
+      }
+    });
+  }
+}
+
+// Inicializar al cargar la página
 document.addEventListener('DOMContentLoaded', function() {
+  carrito = JSON.parse(localStorage.getItem('carrito')) || {};
   actualizarBadgeCarrito();
   renderizarCarrito();
+  sincronizarCantidades();
+});
+
+// Actualizar badge cuando cambia el localStorage (en otra pestaña)
+window.addEventListener('storage', function(e) {
+  if (e.key === 'carrito') {
+    carrito = JSON.parse(e.newValue) || {};
+    actualizarBadgeCarrito();
+    renderizarCarrito();
+    sincronizarCantidades();
+  }
 });
